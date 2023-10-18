@@ -94,3 +94,53 @@ svg.svelte-1rr76ng.svelte-1rr76ng {
   width: 64px;
   height: 64px;
 }
+
+.reverse.svelte-ysz42y {
+  transform: rotate(180deg);
+}
+
+.tip.svelte-ysz42y {
+  transform: rotate(90deg);
+}
+
+.small-button-vertical-padding {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.word-container.svelte-1id9zxc.svelte-1id9zxc {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: lightgray;
+}
+
+.word-container.svelte-1id9zxc .word.svelte-1id9zxc {
+  flex-grow: 1;
+}
+
+.player-container.svelte-o0ed02 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.player-content.svelte-o0ed02 {
+  flex-grow: 1;
+}
+
+.label-top.svelte-bsqfx8 {
+  line-height: 0.05;
+}
+
+.label-transition.svelte-bsqfx8 {
+  transition: font-size 0.05s, line-height 0.1s;
+}
+
+label.text-xs {
+  font-size: 0.7rem;
+}
+
+.line.svelte-io69p8 {
+  height: 1px;
+}
