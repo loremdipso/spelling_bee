@@ -1,5 +1,38 @@
 <script context="module">
-	import { notificationQueue } from "smelte/src";
+	import { writable } from "svelte/store";
+
+	function withColor(color, store) {
+		return (message) =>
+			store.update((u) => [
+				...u,
+				{
+					message,
+					ts: new Date(),
+					color,
+					toString() {
+						return message;
+					},
+				},
+			]);
+	}
+
+	function notificationQueue() {
+		const toastStore = writable([]);
+
+		return {
+			subscribe: toastStore.subscribe,
+
+			notify: withColor("gray", toastStore),
+			error: withColor("error", toastStore),
+			alert: withColor("alert", toastStore),
+
+			remove: (i) =>
+				toastStore.update((u) => {
+					u.splice(i, 1);
+					return u;
+				}),
+		};
+	}
 
 	export const toaster = notificationQueue();
 </script>

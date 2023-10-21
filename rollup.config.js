@@ -75,7 +75,7 @@ export default {
 		}),
 
 		smelte({
-			purge: production,
+			//purge: production,
 			output: "docs/global.css",
 			postcss: [], // Your PostCSS plugins
 			allowlist: [], // Array of classnames whitelisted from purging

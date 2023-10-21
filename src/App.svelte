@@ -1,6 +1,7 @@
 <script lang="ts">
+	import Toast from "./common/Toast.svelte";
 	import { onMount } from "svelte";
-	import Content from "./Content.svelte";
+	import Content from "./components/Content.svelte";
 	onMount(() => {
 		// force-reset scroll top, since for some reason browsers remember this
 		document.body.scrollTop = 0;
@@ -43,6 +44,8 @@
 	</header>
 
 	<Content />
+
+	<Toast />
 </main>
 
 <style lang="scss">
