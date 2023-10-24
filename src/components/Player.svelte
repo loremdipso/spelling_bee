@@ -44,11 +44,19 @@
 			add_word();
 		}
 	}
+
+	let container: HTMLElement;
+	$: {
+		if (isActive && container) {
+			container.scrollIntoView({ behavior: "smooth" });
+		}
+	}
 </script>
 
 <div
 	class="player-container m-2 p-2 bg-white dark:bg-gray-600 duration-200 rounded ease-in shadow-sm hover:shadow"
 	class:is-active={isActive}
+	bind:this={container}
 >
 	{#if !isPlaying}
 		<div>
