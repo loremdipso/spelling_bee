@@ -134,6 +134,10 @@ svg.svelte-1fmpe6o.svelte-1fmpe6o {
   min-width: 344px;
 }
 
+.line.svelte-z73i1c {
+  height: 1px;
+}
+
 .label-top.svelte-1cjwqag {
   line-height: 0.05;
 }
@@ -144,10 +148,6 @@ svg.svelte-1fmpe6o.svelte-1fmpe6o {
 
 label.text-xs {
   font-size: 0.7rem;
-}
-
-.line.svelte-z73i1c {
-  height: 1px;
 }
 
 .reverse.svelte-1vfhdta {
