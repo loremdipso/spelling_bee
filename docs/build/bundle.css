@@ -95,13 +95,17 @@ svg.svelte-1fmpe6o.svelte-1fmpe6o {
   height: 64px;
 }
 
-.player-container.svelte-o0ed02 {
+.player-container.svelte-12h6q14 {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.player-content.svelte-o0ed02 {
+.player-container.is-active.svelte-12h6q14 {
+  background-color: #f36fa0;
+}
+
+.player-content.svelte-12h6q14 {
   flex-grow: 1;
 }
 
