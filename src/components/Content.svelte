@@ -1,11 +1,12 @@
 <script lang="ts">
 	import Button from "smelte/src/components/Button";
 	import Player from "./Player.svelte";
-	import type { IPlayer } from "interfaces";
+	import type { IPlayer, IWord } from "interfaces";
 	import { toaster } from "../common/Toast.svelte";
 	import { shuffleArray } from "../common/misc";
 
 	let isPlaying = false;
+	let currentPlayerIndex = 0;
 
 	function get_players_from_storage(): IPlayer[] {
 		try {
@@ -17,6 +18,7 @@
 
 	const DATA_KEY = "spelling-bee-data";
 	let players: IPlayer[] = get_players_from_storage();
+	let players_backup: IPlayer[] = [];
 
 	function delete_player(playerToDelete: IPlayer) {
 		players = players.filter((player) => player !== playerToDelete);
@@ -35,6 +37,8 @@
 	function toggle_is_playing() {
 		isPlaying = !isPlaying;
 		if (isPlaying) {
+			players_backup = JSON.parse(JSON.stringify(players));
+
 			// remove empty players and empty words
 			for (const player of players) {
 				player.words = player.words.filter((word) => word.text);
@@ -42,6 +46,8 @@
 			}
 
 			players = players.filter((player) => player.name);
+		} else {
+			players = players_backup;
 		}
 	}
 
@@ -59,34 +65,63 @@
 	}
 
 	function shuffle_words() {
-		const allWords = players.flatMap((players) =>
-			players.words.filter((word) => word.text)
+		const playersCopy: IPlayer[] = shuffleArray(
+			JSON.parse(JSON.stringify(players)).filter(
+				(player: IPlayer) => player.name
+			)
 		);
 
-		if (allWords.length < players.length || players.length === 0) {
+		const allWords = shuffleArray(
+			playersCopy.flatMap((player) =>
+				player.words.filter((word) => word.text)
+			)
+		);
+
+		if (allWords.length < playersCopy.length || playersCopy.length === 0) {
 			toaster.error("Failed to shuffle :/ try adding more words");
 			return;
 		}
 
-		const words = shuffleArray(allWords);
-		players = players.filter((player) => player.name);
-		players = shuffleArray(players);
-
-		for (const player of players) {
+		for (const player of playersCopy) {
 			player.words = [];
 		}
 
 		let playerIndex = 0;
-		while (players.length && allWords.length) {
-			const word = allWords.pop();
-			players[playerIndex].words.push(word);
+		console.log(playersCopy);
+		while (allWords.length) {
+			const player = playersCopy[playerIndex];
+			if (!tryToAddWord(player, allWords)) {
+				toaster.alert("Sorry, couldn't quite find an arrangement :/");
+				return;
+			}
+
 			playerIndex += 1;
-			if (playerIndex >= players.length) {
+			if (playerIndex >= playersCopy.length) {
 				playerIndex = 0;
 			}
 		}
 
-		players = players;
+		toaster.notify("Yay! Done :)");
+		players = playersCopy;
+	}
+
+	function tryToAddWord(player: IPlayer, allWords: IWord[]): boolean {
+		// Dumb algo: try to push the next word onto the player. If we can move on. If we can't with any of these words then quit
+		const wordsToReadd: IWord[] = [];
+		while (allWords.length) {
+			let word = allWords.pop();
+			if (
+				player.disallowed_words.findIndex((w) => w === word.text) === -1
+			) {
+				player.words.push(word);
+				allWords.splice(0, 0, ...wordsToReadd);
+				return true;
+			} else {
+				wordsToReadd.push(word);
+			}
+		}
+
+		return false;
 	}
 
 	$: {
@@ -101,24 +136,49 @@
 	$: {
 		window.localStorage.setItem(DATA_KEY, JSON.stringify(players));
 	}
+
+	$: {
+		if (isPlaying) {
+			let minAnswered = Infinity;
+			let minIndex = -1;
+			for (let i = 0; i < players.length; i++) {
+				const player = players[i];
+				const numAnswered = player.words.reduce(
+					(total, word) =>
+						(word.correct !== undefined ? 1 : 0) + total,
+					0
+				);
+
+				if (
+					numAnswered < player.words.length &&
+					(numAnswered < minAnswered || minIndex === -1)
+				) {
+					minAnswered = numAnswered;
+					minIndex = i;
+				}
+			}
+			currentPlayerIndex = minIndex;
+		}
+	}
 </script>
 
 <div>
-	<div>
+	<div class="pt-12 pb-12">
 		<Button on:click={() => toggle_is_playing()}>
 			{isPlaying ? "Back to input" : "Start the game"}
 		</Button>
-		<Button on:click={() => shuffle_words()}>Shuffle words</Button>
 		{#if isPlaying}
+			<Button on:click={() => shuffle_words()}>Shuffle words</Button>
 			<Button on:click={() => reset_scores()}>Reset scores</Button>
 		{:else}
-			<Button on:click={() => reset_game()}>Reset game</Button>
+			<Button on:click={() => reset_game()}>Clear game</Button>
 		{/if}
 	</div>
-	{#each players as player}
+	{#each players as player, i}
 		<Player
 			{player}
 			{isPlaying}
+			isActive={isPlaying && currentPlayerIndex === i}
 			on:delete={() => delete_player(player)}
 			on:player_update={() => update_player(player)}
 		/>

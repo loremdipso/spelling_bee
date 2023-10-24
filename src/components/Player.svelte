@@ -7,6 +7,7 @@
 
 	export let player: IPlayer;
 	export let isPlaying: boolean;
+	export let isActive: boolean;
 
 	let dispatch = createEventDispatcher();
 
@@ -21,6 +22,7 @@
 	}
 
 	function update_word(word: IWord) {
+		word.text = word.text.toLocaleLowerCase();
 		update_player();
 	}
 
@@ -46,6 +48,7 @@
 
 <div
 	class="player-container m-2 p-2 bg-white dark:bg-gray-600 duration-200 rounded ease-in shadow-sm hover:shadow"
+	class:is-active={isActive}
 >
 	{#if !isPlaying}
 		<div>
@@ -92,6 +95,10 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+
+		&.is-active {
+			background-color: #f36fa0;
+		}
 	}
 
 	.player-content {
